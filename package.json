@@ -1,0 +1,10 @@
+{
+  "name": "surface",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "watch": "browser-sync start --server --files \"**/*.js, **/*.html, **/*.css\""
+  },
+  "author": "Rinat Arsaev",
+  "license": ""
+}
