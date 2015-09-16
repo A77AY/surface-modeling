@@ -1,9 +1,19 @@
 var Point = (function () {
-    function Point(x, y //,
-        ) {
+    function Point(x, y, z, matrix) {
         this.x = x;
         this.y = y;
+        this.z = z;
+        this.x2D = 0;
+        this.y2D = 0;
+        if (matrix) {
+            this.projection(matrix);
+        }
     }
+    Point.prototype.projection = function (matrix) {
+        var projection = Matrix.Multiply(new Matrix([[this.x, this.y, this.z, 1]]), matrix);
+        this.x2D = projection.matrix[0][0];
+        this.y2D = projection.matrix[0][1];
+    };
     return Point;
 })();
 var Triangle = (function () {
@@ -88,10 +98,6 @@ var Canvas = (function () {
         this.verticalPartitionsUpdate();
         this.horizontalPartitionsUpdate();
     };
-    Canvas.prototype.projection = function (x, y, z) {
-        var projection = Matrix.Multiply(Matrix.Multiply(new Matrix([[x, y, z, 1]]), this.affine), this.t);
-        return new Point(projection.matrix[0][0], projection.matrix[0][1]);
-    };
     Canvas.prototype.rotationXUpdate = function () {
         var tmpRotation = this.rotationX;
         this.rotationX = Number(this.rotationXSlider.value);
@@ -108,7 +114,7 @@ var Canvas = (function () {
     Canvas.prototype.rotationYUpdate = function () {
         var tmpRotation = this.rotationY;
         this.rotationY = Number(this.rotationYSlider.value);
-        var angle = tmpRotation - this.rotationX;
+        var angle = tmpRotation - this.rotationY;
         var rYSinAngle = Math.sin(angle);
         var rYCosAngle = Math.cos(angle);
         this.affine = Matrix.Multiply(this.affine, new Matrix([
@@ -121,7 +127,7 @@ var Canvas = (function () {
     Canvas.prototype.rotationZUpdate = function () {
         var tmpRotation = this.rotationZ;
         this.rotationZ = Number(this.rotationZSlider.value);
-        var angle = tmpRotation - this.rotationX;
+        var angle = tmpRotation - this.rotationZ;
         var rZSinAngle = Math.sin(angle);
         var rZCosAngle = Math.cos(angle);
         this.affine = Matrix.Multiply(this.affine, new Matrix([
@@ -151,44 +157,43 @@ var Canvas = (function () {
         this.context.fillStyle = '#fff';
         this.context.fillRect(0, 0, this.width, this.height);
         this.context.lineWidth = 1;
-        var m = new Array();
         var a = 200;
         var b = 100;
         var horizontalStep = this.horizontalMax / this.horizontalPartitions;
         var verticalStep = this.verticalMax / this.verticalPartitions;
+        var matrix = Matrix.Multiply(this.affine, this.t);
+        var points = new Array();
+        var triangles = new Array();
         for (var i = 0; i <= this.horizontalPartitions; ++i) {
-            m[i] = new Array();
+            points[i] = new Array();
             for (var j = 0; j <= this.verticalPartitions; ++j) {
-                m[i][j] = this.projection(this.calculationX(horizontalStep * i, verticalStep * j - Math.PI, [a, b]), this.calculationY(horizontalStep * i, verticalStep * j - Math.PI, [a, b]), this.calculationZ(horizontalStep * i, verticalStep * j - Math.PI, [a, b]));
+                points[i][j] = new Point(this.calculationX(horizontalStep * i, verticalStep * j, [a, b]), this.calculationY(horizontalStep * i, verticalStep * j, [a, b]), this.calculationZ(horizontalStep * i, verticalStep * j, [a, b]), matrix);
             }
         }
-        for (var i = 0; i < m.length - 1; ++i) {
-            for (var j = 0; j < m[0].length - 1; ++j) {
-                this.drawTriangle(m[i][j], m[i + 1][j], m[i + 1][j + 1]);
-                this.drawTriangle(m[i][j], m[i][j + 1], m[i + 1][j + 1]);
+        for (var i = 0, k = 0; i < points.length - 1; ++i) {
+            for (var j = 0; j < points[0].length - 1; ++j, ++k) {
+                triangles[k] = new Triangle(points[i][j], points[i + 1][j], points[i + 1][j + 1]);
+                this.drawTriangle(triangles[k]);
+                ++k;
+                triangles[k] = new Triangle(points[i][j], points[i][j + 1], points[i + 1][j + 1]);
+                this.drawTriangle(triangles[k]);
             }
         }
     };
     Canvas.prototype.calculationX = function (u, v, params) {
-        return (params[0] + params[1] * Math.cos(u)) * Math.cos(v);
+        return (params[0] + params[1] * Math.cos(u)) * Math.cos(v - Math.PI);
     };
     Canvas.prototype.calculationY = function (u, v, params) {
-        return (params[0] + params[1] * Math.cos(u)) * Math.sin(v);
+        return (params[0] + params[1] * Math.cos(u)) * Math.sin(v - Math.PI);
     };
     Canvas.prototype.calculationZ = function (u, v, params) {
         return params[1] * Math.sin(u);
     };
-    Canvas.prototype.drawLine = function (start, end) {
+    Canvas.prototype.drawTriangle = function (triangle) {
         this.context.beginPath();
-        this.context.moveTo(start.x, start.y);
-        this.context.lineTo(end.x, end.y);
-        this.context.stroke();
-    };
-    Canvas.prototype.drawTriangle = function (start, middle, end) {
-        this.context.beginPath();
-        this.context.moveTo(start.x, start.y);
-        this.context.lineTo(middle.x, middle.y);
-        this.context.lineTo(end.x, end.y);
+        this.context.moveTo(triangle.p0.x2D, triangle.p0.y2D);
+        this.context.lineTo(triangle.p1.x2D, triangle.p1.y2D);
+        this.context.lineTo(triangle.p2.x2D, triangle.p2.y2D);
         this.context.closePath();
         this.context.stroke();
     };
