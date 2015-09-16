@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Моделирование и простейшая визуализация параметрически заданных поверхностей</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<h1>Моделирование и простейшая визуализация параметрически заданных поверхностей</h1>
+
+<form>
+
+    <table>
+        <tr>
+            <td colspan="2"><h2>Поворот поверхности вокруг осей координат</h2></td>
+        </tr>
+        <tr>
+            <td>Вокруг оси X:</td>
+            <td><input id="rotationX" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationXUpdate()" /></td>
+        </tr>
+        <tr>
+            <td>Вокруг оси Y:</td>
+            <td><input id="rotationY" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationYUpdate()" /></td>
+        </tr>
+        <tr>
+            <td>Вокруг оси Z:</td>
+            <td><input id="rotationZ" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationZUpdate()" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><h2>Параметры разбияения на сегменты</h2></td>
+        </tr>
+        <tr>
+            <td>Максимум по горизонтали</td>
+            <td><input id="horizontalMax" type="range" min="0" max="6.283185307179586476925286766559" step="0.001" value="6.283185307179586476925286766559" oninput="canvas.horizontalMaxUpdate()" /></td>
+        </tr>
+        <tr>
+            <td>Количество разбиений по вертикали</td>
+            <td><input id="horizontalPartitions" type="range" min="0" max="100" step="1" value="25" oninput="canvas.horizontalPartitionsUpdate()" /></td>
+        </tr>
+        <tr>
+            <td>Максимум по вертикали</td>
+            <td><input id="verticalMax" type="range" min="0" max="6.283185307179586476925286766559" step="0.001" value="6.283185307179586476925286766559" oninput="canvas.verticalMaxUpdate()" /></td>
+        </tr>
+        <tr>
+            <td>Количество разбиений по вертикали</td>
+            <td><input id="verticalPartitions" type="range" min="0" max="100" step="1" value="25" oninput="canvas.verticalPartitionsUpdate()" /></td>
+        </tr>
+    </table>
+
+</form>
+
+
+<canvas class="canvas" id="canvas" width="900" height="600"></canvas>
+
+<script src="scripts/main.js"></script>
+
+</body>
+</html>
