@@ -5,6 +5,7 @@ var Point = (function () {
         this.z = z;
         this.x2D = 0;
         this.y2D = 0;
+        this.z2D = 0;
         if (matrix) {
             this.projection(matrix);
         }
@@ -13,6 +14,10 @@ var Point = (function () {
         var projection = Matrix.Multiply(new Matrix([[this.x, this.y, this.z, 1]]), matrix);
         this.x2D = projection.matrix[0][0];
         this.y2D = projection.matrix[0][1];
+        this.z2D = projection.matrix[0][2];
+    };
+    Point.Minus = function (pointA, pointB) {
+        return new Point(pointB.x2D - pointA.x2D, pointB.y2D - pointA.y2D, pointB.z2D - pointA.z2D);
     };
     return Point;
 })();
@@ -21,8 +26,17 @@ var Triangle = (function () {
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
+        this.setColor();
     }
-    Triangle.prototype.normal = function (vectorA, vectroB) {
+    Triangle.prototype.setColor = function () {
+        var v0 = Point.Minus(this.p2, this.p0);
+        var v1 = Point.Minus(this.p1, this.p0);
+        var normal = new Point(v0.x * v1.z - v0.z * v1.y, v0.z * v1.x - v0.x * v1.z, v0.x * v1.y - v0.y * v1.x);
+        var scalar = -normal.z;
+        var ma = Math.sqrt(Math.pow(normal.x, 2) + Math.pow(normal.y, 2) + Math.pow(normal.z, 2));
+        var cosa = scalar / ma;
+        this.color = cosa;
+        this.color = Math.floor(this.color * 255);
     };
     return Triangle;
 })();
@@ -175,7 +189,7 @@ var Canvas = (function () {
                 triangles[k] = new Triangle(points[i][j], points[i + 1][j], points[i + 1][j + 1]);
                 this.drawTriangle(triangles[k]);
                 ++k;
-                triangles[k] = new Triangle(points[i][j], points[i][j + 1], points[i + 1][j + 1]);
+                triangles[k] = new Triangle(points[i][j], points[i + 1][j + 1], points[i][j + 1]);
                 this.drawTriangle(triangles[k]);
             }
         }
@@ -195,6 +209,16 @@ var Canvas = (function () {
         this.context.lineTo(triangle.p1.x2D, triangle.p1.y2D);
         this.context.lineTo(triangle.p2.x2D, triangle.p2.y2D);
         this.context.closePath();
+        if (triangle.color < 0) {
+            this.context.fillStyle = "rgb(255," + (-1 * triangle.color) + ",255)";
+            this.context.strokeStyle = "rgb(255," + (-1 * triangle.color) + ",255)";
+        }
+        else {
+            this.context.fillStyle = "rgb(" + triangle.color + ",255,255)";
+            this.context.strokeStyle = "rgb(" + triangle.color + ",255,255)";
+        }
+        this.context.lineWidth = 0;
+        this.context.fill();
         this.context.stroke();
     };
     return Canvas;
