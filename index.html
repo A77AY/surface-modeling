@@ -7,51 +7,98 @@
 </head>
 <body>
 
-<h1>Моделирование и простейшая визуализация параметрически заданных поверхностей</h1>
 
-<form>
+<canvas class="canvas" id="canvas" width="900" height="700"></canvas>
+
+<form class="form">
 
     <table>
         <tr>
             <td colspan="2"><h2>Поворот поверхности вокруг осей координат</h2></td>
         </tr>
         <tr>
-            <td>Вокруг оси X:</td>
-            <td><input id="rotationX" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationXUpdate()" /></td>
+            <td width="60%">Вокруг оси X <span id="rotationXValue"></span>:</td>
+            <td>0 <input id="rotationX" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationXUpdate()" /> π</td>
         </tr>
         <tr>
-            <td>Вокруг оси Y:</td>
-            <td><input id="rotationY" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationYUpdate()" /></td>
+            <td>Вокруг оси Y <span id="rotationYValue"></span>:</td>
+            <td>0 <input id="rotationY" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationYUpdate()" /> π</td>
         </tr>
         <tr>
-            <td>Вокруг оси Z:</td>
-            <td><input id="rotationZ" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationZUpdate()" /></td>
+            <td>Вокруг оси Z <span id="rotationZValue"></span>:</td>
+            <td>0 <input id="rotationZ" type="range" min="0" max="3.1415926535897932384626433832795" step="0.001" value="0" oninput="canvas.rotationZUpdate()" /> π</td>
         </tr>
         <tr>
             <td colspan="2"><h2>Параметры разбияения на сегменты</h2></td>
         </tr>
         <tr>
-            <td>Максимум по горизонтали</td>
-            <td><input id="horizontalMax" type="range" min="0" max="6.283185307179586476925286766559" step="0.001" value="6.283185307179586476925286766559" oninput="canvas.horizontalMaxUpdate()" /></td>
+            <td>Максимум по горизонтали <span id="horizontalMaxValue"></span>:</td>
+            <td>0 <input id="horizontalMax" type="range" min="0" max="6.283185307179586476925286766559" step="0.001" value="6.283185307179586476925286766559" oninput="canvas.horizontalMaxUpdate()" /> 2π</td>
         </tr>
         <tr>
-            <td>Количество разбиений по вертикали</td>
-            <td><input id="horizontalPartitions" type="range" min="0" max="100" step="1" value="25" oninput="canvas.horizontalPartitionsUpdate()" /></td>
+            <td>Количество разбиений по вертикали  <span id="horizontalPartitionsValue"></span>:</td>
+            <td>0 <input id="horizontalPartitions" type="range" min="0" max="100" step="1" value="25" oninput="canvas.horizontalPartitionsUpdate()" /> 100</td>
         </tr>
         <tr>
-            <td>Максимум по вертикали</td>
-            <td><input id="verticalMax" type="range" min="0" max="6.283185307179586476925286766559" step="0.001" value="6.283185307179586476925286766559" oninput="canvas.verticalMaxUpdate()" /></td>
+            <td>Максимум по вертикали <span id="verticalMaxValue"></span>:</td>
+            <td>0 <input id="verticalMax" type="range" min="0" max="6.283185307179586476925286766559" step="0.001" value="6.283185307179586476925286766559" oninput="canvas.verticalMaxUpdate()" /> 2π</td>
         </tr>
         <tr>
-            <td>Количество разбиений по вертикали</td>
-            <td><input id="verticalPartitions" type="range" min="0" max="100" step="1" value="25" oninput="canvas.verticalPartitionsUpdate()" /></td>
+            <td>Количество разбиений по вертикали <span id="verticalPartitionsValue"></span>:</td>
+            <td>0 <input id="verticalPartitions" type="range" min="0" max="100" step="1" value="25" oninput="canvas.verticalPartitionsUpdate()" /> 100</td>
         </tr>
+
+        <tr>
+            <td colspan="2"><h2>Закраска</h2></td>
+        </tr>
+        <tr>
+            <td>Сплошная закраска</td>
+            <td><input type="radio" value="flat" name="fill" onchange="canvas.fillUpdate(true)" checked /></td>
+        </tr>
+        <tr>
+            <td>Сетка</td>
+            <td><input type="radio" value="grid" name="fill" onchange="canvas.fillUpdate(false)" /></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><h2>Цвета</h2></td>
+        </tr>
+        <tr style="vertical-align: top">
+            <td>Внешний цвет <span style="display: inline-block; border: 1px solid black; height: 30px; width: 30px" id="color" width="20" height="20"></span></td>
+
+            <td>
+                R <input id="r" type="range" min="0" max="255" step="1" value="255" oninput="canvas.setColor(0)" class="color" /><br>
+                G <input id="g" type="range" min="0" max="255" step="1" value="0" oninput="canvas.setColor(1)" class="color" /><br>
+                B <input id="b" type="range" min="0" max="255" step="1" value="0" oninput="canvas.setColor(2)" class="color" />
+            </td>
+        </tr>
+
+        <tr style="vertical-align: top">
+            <td>Внутренний цвет <span style="display: inline-block; border: 1px solid black; height: 30px; width: 30px"  style="display: inline-block" id="colorInside" width="20" height="20"></span></td>
+
+            <td>
+                R <input id="ri" type="range" min="0" max="255" step="1" value="0" oninput="canvas.setInsideColor(0)" class="color" /><br>
+                G <input id="gi" type="range" min="0" max="255" step="1" value="255" oninput="canvas.setInsideColor(1)" class="color" /><br>
+                B <input id="bi" type="range" min="0" max="255" step="1" value="0" oninput="canvas.setInsideColor(2)" class="color" />
+            </td>
+        </tr>
+        <!--<tr>-->
+            <!--<td colspan="2"><h2>Параметры фигуры</h2></td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td>A</td>-->
+            <!--<td><input id="a" type="range" min="0" max="6.283185307179586476925286766559" step="0.001" value="6.283185307179586476925286766559" oninput="canvas.aUpdate()" /></td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td>B</td>-->
+            <!--<td><input id="b" type="range" min="0" max="100" step="1" value="25" oninput="canvas.bUpdate()" /></td>-->
+        <!--</tr>-->
     </table>
 
 </form>
 
 
-<canvas class="canvas" id="canvas" width="900" height="600"></canvas>
+<div class="copy">2015. Арсаев Ринат Вадимович, ПРО-404</div>
 
 <script src="scripts/main.js"></script>
 

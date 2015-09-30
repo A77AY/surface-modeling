@@ -10,4 +10,14 @@ body {
 }
 .canvas {
   border: 1px solid #ccc;
+  display: inline-block;
+  vertical-align: top;
+}
+.form {
+  display: inline-block;
+  vert-align: top;
+}
+.copy {
+  width: 100%;
+  line-height: 30px;
 }

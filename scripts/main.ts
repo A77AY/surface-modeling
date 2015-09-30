@@ -43,23 +43,15 @@ class Triangle {
     }
 
     setColor() {
-        var v0 = Point.Minus(this.p2, this.p0);
-        var v1 = Point.Minus(this.p1, this.p0);
+        this.color = this.vectorColor(Point.Minus(this.p2, this.p0), Point.Minus(this.p1, this.p0));
+    }
 
-
+    vectorColor(v0: Point, v1: Point) {
         var normal = new Point(
-            v0.x * v1.z - v0.z * v1.y,
+            v0.y * v1.z - v0.z * v1.y,
             v0.z * v1.x - v0.x * v1.z,
             v0.x * v1.y - v0.y * v1.x);
-
-        var scalar = -normal.z;
-
-        var ma = Math.sqrt(Math.pow(normal.x,2) + Math.pow(normal.y,2) + Math.pow(normal.z,2));
-
-        var cosa = scalar / ma;
-
-        this.color = cosa;
-        this.color = Math.floor(this.color*255);
+        return -normal.z / (Math.sqrt(Math.pow(normal.x,2) + Math.pow(normal.y,2) + Math.pow(normal.z,2)));
     }
 }
 
@@ -121,6 +113,13 @@ class Canvas {
     verticalPartitions: number;
     affine: Matrix;
     t: Matrix;
+    isFill: boolean = true;
+    insideColorR = 0;
+    insideColorG = 255;
+    insideColorB = 0;
+    colorR = 255;
+    colorG = 0;
+    colorB = 0;
 
     constructor(
         private canvas: HTMLCanvasElement,
@@ -130,7 +129,18 @@ class Canvas {
         private horizontalMaxSlider: HTMLInputElement,
         private verticalMaxSlider: HTMLInputElement,
         private horizontalPartitionsSlider: HTMLInputElement,
-        private verticalPartitionsSlider: HTMLInputElement
+        private verticalPartitionsSlider: HTMLInputElement,
+
+        private rotationXSliderValue: HTMLElement,
+        private rotationYSliderValue: HTMLElement,
+        private rotationZSliderValue: HTMLElement,
+        private horizontalMaxSliderValue: HTMLElement,
+        private verticalMaxSliderValue: HTMLElement,
+        private horizontalPartitionsSliderValue: HTMLElement,
+        private verticalPartitionsSliderValue: HTMLElement,
+
+        private aSlider: HTMLInputElement,
+        private bSlider: HTMLInputElement
     ) {
         this.init();
         this.draw();
@@ -155,6 +165,9 @@ class Canvas {
         this.rotationX = Number(this.rotationXSlider.value);
         this.rotationY = Number(this.rotationYSlider.value);
         this.rotationZ = Number(this.rotationZSlider.value);
+        this.rotationXUpdate();
+        this.rotationYUpdate();
+        this.rotationZUpdate();
         this.verticalMaxUpdate();
         this.horizontalMaxUpdate();
         this.verticalPartitionsUpdate();
@@ -162,7 +175,21 @@ class Canvas {
 
     }
 
+    fillUpdate(value: boolean){
+        this.isFill = value;
+        this.draw();
+    }
+
+    aUpdate() {
+
+    }
+
+    bUpdate() {
+
+    }
+
     rotationXUpdate() {
+        this.rotationXSliderValue.innerHTML = this.rotationXSlider.value;
         var tmpRotation = this.rotationX;
         this.rotationX = Number(this.rotationXSlider.value);
         var angle = tmpRotation-this.rotationX;
@@ -178,6 +205,7 @@ class Canvas {
     }
 
     rotationYUpdate() {
+        this.rotationYSliderValue.innerHTML = this.rotationYSlider.value;
         var tmpRotation = this.rotationY;
         this.rotationY = Number(this.rotationYSlider.value);
         var angle = tmpRotation-this.rotationY;
@@ -189,10 +217,12 @@ class Canvas {
                 [0, 1, 0, 0],
                 [rYSinAngle, 0, rYCosAngle, 0],
                 [0, 0, 0, 1]]));
+
         this.draw();
     }
 
     rotationZUpdate() {
+        this.rotationZSliderValue.innerHTML = this.rotationZSlider.value;
         var tmpRotation = this.rotationZ;
         this.rotationZ = Number(this.rotationZSlider.value);
         var angle = tmpRotation-this.rotationZ;
@@ -208,19 +238,23 @@ class Canvas {
     }
 
     horizontalMaxUpdate() {
+        this.horizontalMaxSliderValue.innerHTML = this.horizontalMaxSlider.value;
         this.horizontalMax = Number(this.horizontalMaxSlider.value);
         this.draw();
     }
 
     verticalMaxUpdate() {
+        this.verticalMaxSliderValue.innerHTML = this.verticalMaxSlider.value;
         this.verticalMax = Number(this.verticalMaxSlider.value);
         this.draw();
     }
     horizontalPartitionsUpdate() {
+        this.horizontalPartitionsSliderValue.innerHTML = this.horizontalPartitionsSlider.value;
         this.horizontalPartitions = Number(this.horizontalPartitionsSlider.value);
         this.draw();
     }
     verticalPartitionsUpdate() {
+        this.verticalPartitionsSliderValue.innerHTML = this.verticalPartitionsSlider.value;
         this.verticalPartitions = Number(this.verticalPartitionsSlider.value);
         this.draw();
     }
@@ -252,15 +286,27 @@ class Canvas {
             }
         }
 
-        for(var i=0, k=0; i<points.length - 1; ++i) {
-            for (var j = 0; j < points[0].length - 1; ++j, ++k) {
-                triangles[k] = new Triangle(points[i][j], points[i+1][j], points[i+1][j+1]);
-                this.drawTriangle(triangles[k]);
-                ++k;
-                triangles[k] = new Triangle(points[i][j], points[i+1][j+1], points[i][j+1]);
-                this.drawTriangle(triangles[k]);
+        for(var i=0; i<points.length - 1; ++i) {
+            for (var j = 0; j < points[0].length - 1; ++j) {
+                var triangle = new Triangle(points[i][j], points[i+1][j+1], points[i+1][j]);
+                var triangle2 = new Triangle(points[i+1][j+1], points[i][j], points[i][j+1]);
+                triangles.push(triangle);
+                triangles.push(triangle2);
             }
         }
+
+        for(var i=0; i<triangles.length; ++i) {
+            if(triangles[i].color < 0) {
+                this.drawTriangle(triangles[i]);
+            }
+        }
+
+        for(var i=0; i<triangles.length; ++i) {
+            if(triangles[i].color >= 0) {
+                this.drawTriangle(triangles[i]);
+            }
+        }
+
     }
 
     calculationX(u: number, v:number, params: Array<number>) {
@@ -272,7 +318,7 @@ class Canvas {
     }
 
     calculationZ(u: number, v:number, params: Array<number>) {
-        return params[1]*Math.sin(u);
+        return params[1]*Math.sin(u)+params[1]*Math.cos(u);
     }
 
     drawTriangle(triangle: Triangle) {
@@ -281,17 +327,68 @@ class Canvas {
         this.context.lineTo(triangle.p1.x2D,triangle.p1.y2D);
         this.context.lineTo(triangle.p2.x2D,triangle.p2.y2D);
         this.context.closePath();
-        if(triangle.color < 0) {
-            this.context.fillStyle = "rgb(255,"+(-1*triangle.color)+",255)";
-            this.context.strokeStyle = "rgb(255,"+(-1*triangle.color)+",255)";
+        if(this.isFill){
+            if(triangle.color < 0){
+                var r = -Math.floor(this.insideColorR * triangle.color);
+                var g = -Math.floor(this.insideColorG * triangle.color);
+                var b = -Math.floor(this.insideColorB * triangle.color);
+
+
+
+            }
+            else {
+                var r = Math.floor(this.colorR * triangle.color);
+                var g = Math.floor(this.colorG * triangle.color);
+                var b = Math.floor(this.colorB * triangle.color);
+
+            }
+            var color = "rgb("+r+","+g+","+b+")";
+
+            this.context.fillStyle = this.context.strokeStyle = color;
+            this.context.lineWidth = 0;
+            this.context.fill();
         }
-        else {
-            this.context.fillStyle = "rgb("+ triangle.color +",255,255)";
-            this.context.strokeStyle = "rgb("+ triangle.color +",255,255)";
-        }
-        this.context.lineWidth = 0;
-        this.context.fill();
         this.context.stroke();
+    }
+
+    setColor(color: number) {
+        var colorRes;
+        switch(color){
+            case 0:
+                colorRes = document.getElementById('r').value;
+                this.colorR = colorRes;
+                break;
+            case 1:
+                colorRes = document.getElementById('g').value;
+                this.colorG = colorRes;
+                break;
+            case 2:
+                colorRes = document.getElementById('b').value;
+                this.colorB = colorRes;
+                break;
+        }
+        document.getElementById('color').style.backgroundColor = "rgb("+this.colorR+","+this.colorG+","+this.colorB+")";
+        this.draw();
+    }
+
+    setInsideColor(color: number) {
+        var colorRes;
+        switch(color){
+            case 0:
+                colorRes = document.getElementById('ri').value;
+                this.insideColorR = colorRes;
+                break;
+            case 1:
+                colorRes = document.getElementById('gi').value;
+                this.insideColorG = colorRes;
+                break;
+            case 2:
+                colorRes = document.getElementById('bi').value;
+                this.insideColorB = colorRes;
+                break;
+        }
+        document.getElementById('colorInside').style.backgroundColor = "rgb("+this.insideColorR+","+this.insideColorG+","+this.insideColorB+")";
+        this.draw();
     }
 }
 
@@ -303,5 +400,19 @@ var canvas: Canvas = new Canvas(
     <HTMLInputElement>document.getElementById("horizontalMax"),
     <HTMLInputElement>document.getElementById("verticalMax"),
     <HTMLInputElement>document.getElementById("horizontalPartitions"),
-    <HTMLInputElement>document.getElementById("verticalPartitions")
+    <HTMLInputElement>document.getElementById("verticalPartitions"),
+
+    <HTMLElement>document.getElementById("rotationXValue"),
+    <HTMLElement>document.getElementById("rotationYValue"),
+    <HTMLElement>document.getElementById("rotationZValue"),
+    <HTMLElement>document.getElementById("horizontalMaxValue"),
+    <HTMLElement>document.getElementById("verticalMaxValue"),
+    <HTMLElement>document.getElementById("horizontalPartitionsValue"),
+    <HTMLElement>document.getElementById("verticalPartitionsValue"),
+
+    <HTMLInputElement>document.getElementById("a"),
+    <HTMLInputElement>document.getElementById("b")
 );
+
+canvas.setColor(0);
+canvas.setInsideColor(1);
