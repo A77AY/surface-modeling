@@ -1,3 +1,15 @@
+var canvasEl = document.getElementById("canvas");
+window.onload = function (e) {
+    canvasResize();
+};
+window.onresize = function (e) {
+    canvasResize();
+};
+function canvasResize() {
+    canvasEl.width = document.body.clientWidth / 2;
+    canvasEl.height = document.body.clientHeight;
+    canvas.sizeUpdate();
+}
 var Point = (function () {
     function Point(x, y, z, matrix) {
         this.x = x;
@@ -102,9 +114,9 @@ var Canvas = (function () {
         this.draw();
     }
     Canvas.prototype.init = function () {
-        this.context = this.canvas.getContext('2d');
         this.width = this.canvas.width;
         this.height = this.canvas.height;
+        this.context = this.canvas.getContext('2d');
         this.affine = new Matrix([
             [1, 0, 0, 0],
             [0, 1, 0, 0],
@@ -127,6 +139,17 @@ var Canvas = (function () {
         this.horizontalMaxUpdate();
         this.verticalPartitionsUpdate();
         this.horizontalPartitionsUpdate();
+    };
+    Canvas.prototype.sizeUpdate = function () {
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        this.t = new Matrix([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [this.width / 2, this.height / 2, 0, 1]
+        ]);
+        this.draw();
     };
     Canvas.prototype.fillUpdate = function (value) {
         this.isFill = value;
@@ -271,15 +294,15 @@ var Canvas = (function () {
         var colorRes;
         switch (color) {
             case 0:
-                colorRes = document.getElementById('r').value;
+                colorRes = document.getElementById('rValue').innerHTML = document.getElementById('r').value;
                 this.colorR = colorRes;
                 break;
             case 1:
-                colorRes = document.getElementById('g').value;
+                colorRes = document.getElementById('gValue').innerHTML = document.getElementById('g').value;
                 this.colorG = colorRes;
                 break;
             case 2:
-                colorRes = document.getElementById('b').value;
+                colorRes = document.getElementById('bValue').innerHTML = document.getElementById('b').value;
                 this.colorB = colorRes;
                 break;
         }
@@ -290,15 +313,15 @@ var Canvas = (function () {
         var colorRes;
         switch (color) {
             case 0:
-                colorRes = document.getElementById('ri').value;
+                colorRes = document.getElementById('riValue').innerHTML = document.getElementById('ri').value;
                 this.insideColorR = colorRes;
                 break;
             case 1:
-                colorRes = document.getElementById('gi').value;
+                colorRes = document.getElementById('giValue').innerHTML = document.getElementById('gi').value;
                 this.insideColorG = colorRes;
                 break;
             case 2:
-                colorRes = document.getElementById('bi').value;
+                colorRes = document.getElementById('biValue').innerHTML = document.getElementById('bi').value;
                 this.insideColorB = colorRes;
                 break;
         }
@@ -309,5 +332,9 @@ var Canvas = (function () {
 })();
 var canvas = new Canvas(document.getElementById("canvas"), document.getElementById("rotationX"), document.getElementById("rotationY"), document.getElementById("rotationZ"), document.getElementById("horizontalMax"), document.getElementById("verticalMax"), document.getElementById("horizontalPartitions"), document.getElementById("verticalPartitions"), document.getElementById("rotationXValue"), document.getElementById("rotationYValue"), document.getElementById("rotationZValue"), document.getElementById("horizontalMaxValue"), document.getElementById("verticalMaxValue"), document.getElementById("horizontalPartitionsValue"), document.getElementById("verticalPartitionsValue"), document.getElementById("a"), document.getElementById("b"));
 canvas.setColor(0);
+canvas.setColor(1);
+canvas.setColor(2);
+canvas.setInsideColor(0);
 canvas.setInsideColor(1);
+canvas.setInsideColor(2);
 //# sourceMappingURL=main.js.map

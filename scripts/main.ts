@@ -1,3 +1,19 @@
+var canvasEl:HTMLCanvasElement = <HTMLCanvasElement>document.getElementById("canvas");
+
+window.onload = (e) => {
+    canvasResize();
+};
+
+window.onresize = (e) => {
+    canvasResize();
+};
+
+function canvasResize() {
+    canvasEl.width = document.body.clientWidth/2;
+    canvasEl.height = document.body.clientHeight;
+    canvas.sizeUpdate();
+}
+
 class Point {
 
     x2D: number = 0;
@@ -147,9 +163,9 @@ class Canvas {
     }
 
     init() {
-        this.context = this.canvas.getContext('2d');
         this.width = this.canvas.width;
         this.height = this.canvas.height;
+        this.context = this.canvas.getContext('2d');
         this.affine = new Matrix([
             [1, 0, 0, 0],
             [0, 1, 0, 0],
@@ -173,6 +189,18 @@ class Canvas {
         this.verticalPartitionsUpdate();
         this.horizontalPartitionsUpdate();
 
+    }
+
+    sizeUpdate(){
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        this.t = new Matrix([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [this.width/2, this.height/2, 0, 1]
+        ]);
+        this.draw();
     }
 
     fillUpdate(value: boolean){
@@ -355,15 +383,15 @@ class Canvas {
         var colorRes;
         switch(color){
             case 0:
-                colorRes = document.getElementById('r').value;
+                colorRes = document.getElementById('rValue').innerHTML = document.getElementById('r').value;
                 this.colorR = colorRes;
                 break;
             case 1:
-                colorRes = document.getElementById('g').value;
+                colorRes = document.getElementById('gValue').innerHTML = document.getElementById('g').value;
                 this.colorG = colorRes;
                 break;
             case 2:
-                colorRes = document.getElementById('b').value;
+                colorRes = document.getElementById('bValue').innerHTML = document.getElementById('b').value;
                 this.colorB = colorRes;
                 break;
         }
@@ -375,15 +403,15 @@ class Canvas {
         var colorRes;
         switch(color){
             case 0:
-                colorRes = document.getElementById('ri').value;
+                colorRes = document.getElementById('riValue').innerHTML = document.getElementById('ri').value;
                 this.insideColorR = colorRes;
                 break;
             case 1:
-                colorRes = document.getElementById('gi').value;
+                colorRes = document.getElementById('giValue').innerHTML = document.getElementById('gi').value;
                 this.insideColorG = colorRes;
                 break;
             case 2:
-                colorRes = document.getElementById('bi').value;
+                colorRes = document.getElementById('biValue').innerHTML = document.getElementById('bi').value;
                 this.insideColorB = colorRes;
                 break;
         }
@@ -415,4 +443,8 @@ var canvas: Canvas = new Canvas(
 );
 
 canvas.setColor(0);
+canvas.setColor(1);
+canvas.setColor(2);
+canvas.setInsideColor(0);
 canvas.setInsideColor(1);
+canvas.setInsideColor(2);
