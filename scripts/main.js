@@ -84,6 +84,33 @@ var Matrix = (function () {
     };
     return Matrix;
 })();
+var Arrow = (function () {
+    function Arrow(p0, p1, text) {
+        if (text === void 0) { text = ""; }
+        this.p0 = p0;
+        this.p1 = p1;
+        this.text = text;
+        this.p0.x2D = this.p0.x;
+        this.p0.y2D = this.p0.y;
+        this.p1.x2D = this.p1.x;
+        this.p1.y2D = this.p1.y;
+    }
+    Arrow.prototype.draw = function (context) {
+        var headlen = 10;
+        var angle = Math.atan2(this.p1.y2D - this.p0.y2D, this.p1.x2D - this.p0.x2D);
+        context.font = "20px Arial";
+        context.fillStyle = context.strokeStyle = "#333";
+        context.beginPath();
+        context.moveTo(this.p0.x2D, this.p0.y2D);
+        context.lineTo(this.p1.x2D, this.p1.y2D);
+        context.lineTo(this.p1.x2D - headlen * Math.cos(angle - Math.PI / 6), this.p1.y2D - headlen * Math.sin(angle - Math.PI / 6));
+        context.moveTo(this.p1.x2D, this.p1.y2D);
+        context.lineTo(this.p1.x2D - headlen * Math.cos(angle + Math.PI / 6), this.p1.y2D - headlen * Math.sin(angle + Math.PI / 6));
+        context.stroke();
+        context.fillText(this.text, this.p1.x2D - headlen * 4 * Math.cos(angle + Math.PI / 6), this.p1.y2D - headlen * 4 * Math.sin(angle + Math.PI / 6));
+    };
+    return Arrow;
+})();
 var Canvas = (function () {
     function Canvas(canvas, rotationXSlider, rotationYSlider, rotationZSlider, horizontalMaxSlider, verticalMaxSlider, horizontalPartitionsSlider, verticalPartitionsSlider, rotationXSliderValue, rotationYSliderValue, rotationZSliderValue, horizontalMaxSliderValue, verticalMaxSliderValue, horizontalPartitionsSliderValue, verticalPartitionsSliderValue, aSlider, bSlider) {
         this.canvas = canvas;
@@ -246,6 +273,9 @@ var Canvas = (function () {
                 triangles.push(triangle2);
             }
         }
+        var size = Math.min(this.width, this.height) / 2;
+        (new Arrow(new Point(0, this.height / 2, 0), new Point(this.width, this.height / 2, 0), "x")).draw(this.context);
+        (new Arrow(new Point(this.width / 2, this.height, 0), new Point(this.width / 2, 0, 0), "y")).draw(this.context);
         for (var i = 0; i < triangles.length; ++i) {
             if (triangles[i].color < 0) {
                 this.drawTriangle(triangles[i]);

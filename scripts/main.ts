@@ -115,6 +115,33 @@ class Matrix {
     }
 }
 
+class Arrow {
+    constructor(
+        public p0: Point,
+        public p1: Point,
+        public text: string = ""
+    ) {
+        this.p0.x2D = this.p0.x;
+        this.p0.y2D = this.p0.y;
+        this.p1.x2D = this.p1.x;
+        this.p1.y2D = this.p1.y;
+    }
+    draw(context: CanvasRenderingContext2D){
+        var headlen = 10;
+        var angle = Math.atan2(this.p1.y2D-this.p0.y2D,this.p1.x2D-this.p0.x2D);
+        context.font = "20px Arial";
+        context.fillStyle = context.strokeStyle = "#333";
+        context.beginPath();
+        context.moveTo(this.p0.x2D, this.p0.y2D);
+        context.lineTo(this.p1.x2D, this.p1.y2D);
+        context.lineTo(this.p1.x2D-headlen*Math.cos(angle-Math.PI/6),this.p1.y2D-headlen*Math.sin(angle-Math.PI/6));
+        context.moveTo(this.p1.x2D, this.p1.y2D);
+        context.lineTo(this.p1.x2D-headlen*Math.cos(angle+Math.PI/6),this.p1.y2D-headlen*Math.sin(angle+Math.PI/6));
+        context.stroke();
+        context.fillText(this.text,this.p1.x2D-headlen*4*Math.cos(angle+Math.PI/6),this.p1.y2D-headlen*4*Math.sin(angle+Math.PI/6));
+    }
+}
+
 class Canvas {
 
     context: CanvasRenderingContext2D;
@@ -323,6 +350,10 @@ class Canvas {
             }
         }
 
+        var size = Math.min(this.width, this.height)/2;
+        (new Arrow(new Point(0, this.height/2, 0), new Point(this.width, this.height/2, 0), "x")).draw(this.context);
+        (new Arrow(new Point(this.width/2, this.height, 0), new Point(this.width/2, 0, 0), "y")).draw(this.context);
+
         for(var i=0; i<triangles.length; ++i) {
             if(triangles[i].color < 0) {
                 this.drawTriangle(triangles[i]);
@@ -360,9 +391,6 @@ class Canvas {
                 var r = -Math.floor(this.insideColorR * triangle.color);
                 var g = -Math.floor(this.insideColorG * triangle.color);
                 var b = -Math.floor(this.insideColorB * triangle.color);
-
-
-
             }
             else {
                 var r = Math.floor(this.colorR * triangle.color);

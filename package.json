@@ -1,10 +1,10 @@
 {
-  "name": "surface",
+  "name": "surface-modeling",
   "version": "0.0.1",
-  "description": "",
+  "description": "Parametric surface modeling and visualization on canvas",
   "scripts": {
     "watch": "browser-sync start --server --files \"**/*.js, **/*.html, **/*.css\""
   },
   "author": "Rinat Arsaev",
-  "license": ""
+  "license": "MIT"
 }

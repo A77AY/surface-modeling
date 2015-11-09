@@ -1,2 +1,2 @@
-# surface-modeling
-Parametric surface modeling and visualization
+# Surface modeling
+Parametric surface modeling and visualization on canvas
