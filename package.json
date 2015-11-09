@@ -6,5 +6,10 @@
     "watch": "browser-sync start --server --files \"**/*.js, **/*.html, **/*.css\""
   },
   "author": "Rinat Arsaev",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "react": "^0.14.2",
+    "tsd": "^0.6.5",
+    "typed-react": "^3.4.1"
+  }
 }
