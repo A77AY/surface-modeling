@@ -3,13 +3,10 @@
   "version": "0.0.1",
   "description": "Parametric surface modeling and visualization on canvas",
   "scripts": {
-    "watch": "browser-sync start --server --files \"**/*.js, **/*.html, **/*.css\""
+    "start": "browser-sync start --server --files \"**/*.js, **/*.html, **/*.css\""
   },
   "author": "Rinat Arsaev",
   "license": "MIT",
   "dependencies": {
-    "react": "^0.14.2",
-    "tsd": "^0.6.5",
-    "typed-react": "^3.4.1"
   }
 }
